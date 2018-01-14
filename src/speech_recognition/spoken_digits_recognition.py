@@ -20,10 +20,10 @@ database = MfccDatabase(data)
 # Get the MFCC matrix size
 n_mfcc = database.getNMfcc()
 n_frames = database.getNFrames()
-batch_size = 10
+batch_size = 50
 
 # Separate train and test samples
-train_set, test_set = database.trainTestSet(0.9)
+train_set, test_set = database.trainTestSet(0.85)
 
 # Define the neural network structure
 neural_net = NeuralNetwork(
@@ -39,7 +39,7 @@ neural_net = NeuralNetwork(
 neural_net.train_neural_network(
     train_set=train_set,
     test_set=test_set,
-    net_model=neural_net.neural_network_model
+    net_model=neural_net.conv_neural_network_model
     )
 
 #neural_net.predict(train_set.get_data()[0], train_set.get_labels()[0])

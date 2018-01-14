@@ -58,27 +58,29 @@ class NeuralNetwork:
         return output
 
     def conv_neural_network_model(self):
+        conv1_filters = 64
+        conv2_filters = 30
+        pool2_flat_size = int(self.n_frames/4)*int(self.n_mfcc/4)*conv2_filters
+        pool2_flat_dense_size = 500
 
         input_layer = tf.reshape(self.x, [-1, self.n_frames, self.n_mfcc, 1])
-
         conv1 = tf.layers.conv2d(
             inputs=input_layer,
-            filters=10,
+            filters=conv1_filters,
             kernel_size=[5, 5],
             padding="same",
             activation=tf.nn.relu)
         pool1 = tf.layers.max_pooling2d(inputs=conv1, pool_size=[2, 2], strides=2)
-
         conv2 = tf.layers.conv2d(
             inputs=pool1,
-            filters=10,
+            filters=conv2_filters,
             kernel_size=[5, 5],
             padding="same",
             activation=tf.nn.relu)
         pool2 = tf.layers.max_pooling2d(inputs=conv2, pool_size=[2, 2], strides=2)
 
-        pool2_flat = tf.reshape(pool2, [-1, 200])
-        dense = tf.layers.dense(inputs=pool2_flat, units=1024, activation=tf.nn.relu)
+        pool2_flat = tf.reshape(pool2, [-1, pool2_flat_size])
+        dense = tf.layers.dense(inputs=pool2_flat, units=pool2_flat_dense_size, activation=tf.nn.relu)
         dropout = tf.layers.dropout(inputs=dense, rate=0.4, training=True)
 
         logits = tf.layers.dense(inputs=dropout, units=10)
