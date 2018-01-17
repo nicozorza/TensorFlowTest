@@ -58,10 +58,10 @@ class NeuralNetwork:
         return output
 
     def conv_neural_network_model(self):
-        conv1_filters = 64
-        conv2_filters = 30
+        conv1_filters = 300
+        conv2_filters = 100
         pool2_flat_size = int(self.n_frames/4)*int(self.n_mfcc/4)*conv2_filters
-        pool2_flat_dense_size = 500
+        pool2_flat_dense_size = 200
 
         input_layer = tf.reshape(self.x, [-1, self.n_frames, self.n_mfcc, 1])
         conv1 = tf.layers.conv2d(

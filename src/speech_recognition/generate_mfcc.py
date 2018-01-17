@@ -16,7 +16,7 @@ OUT_FILE = 'Database'
 # Get the names of the directories in the wav database
 NUMBERS_DIR_LIST = os.listdir(WAV_DIR)
 
-n_mfcc = 10                 # Number of MFCC coefficients
+n_mfcc = 15                 # Number of MFCC coefficients
 preemphasis_coeff = 0.98
 frame_length = 0.02         # Length of the frame window
 frame_stride = 0.01         # Slide of the window
@@ -26,6 +26,9 @@ num_filters = 40            # Number of filters in the filterbank
 database = MfccDatabase()
 
 figure = 0
+show_figures = False
+
+wav_counter = 0
 for dirs in range(len(NUMBERS_DIR_LIST)):
     # Get the name of the directory
     dir_name = NUMBERS_DIR_LIST[dirs]
@@ -33,6 +36,7 @@ for dirs in range(len(NUMBERS_DIR_LIST)):
     wav_list_path = os.listdir(WAV_DIR+'/'+dir_name)
 
     for wavs in range(len(wav_list_path)):
+        wav_counter += 1
         wav_name = wav_list_path[wavs].split('.')[0]    # Get the wav name without extension
 
         # Read the wav file
@@ -59,15 +63,22 @@ for dirs in range(len(NUMBERS_DIR_LIST)):
             label=int(dir_name),    # The directory name is the same as the label
             mfcc=mfcc
         )
-        if wavs == 0:
+        if wavs == 0 and show_figures:
             plt.figure(num=figure, figsize=(2, 2))
             figure = figure + 1
             heatmap = plt.pcolor(mfcc)
             plt.title(wav_name)
             plt.draw()
-plt.show()
+
+        print('Wav', wav_counter, 'completed out of', len(wav_list_path)*len(NUMBERS_DIR_LIST), 'Label: ', dir_name)
+if show_figures:
+    plt.show()
+
 # Save the database into a file
 file = open(MFCC_DIR + '/' + OUT_FILE, 'wb')
 # Trim the samples to a fixed length
-pickle.dump(database.sampleTrim().print(), file)
+pickle.dump(database.sampleCompleteZeros().print(), file)
 file.close()
+
+print("Database generated")
+print("Number of elements in database: " + str(database.length))

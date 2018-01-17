@@ -7,9 +7,9 @@ import pickle
 MFCC_DIR = '/home/nicozorza/Escritorio/TensorflowTest/digits_database'
 OUT_FILE = 'Database'
 
-learning_rate = 0.003
+learning_rate = 0.01
 n_classes = 10
-n_epochs = 1000
+n_epochs = 10
 
 # Load the database
 file = open(MFCC_DIR+'/'+OUT_FILE, 'rb')
@@ -23,7 +23,7 @@ n_frames = database.getNFrames()
 batch_size = 50
 
 # Separate train and test samples
-train_set, test_set = database.trainTestSet(0.85)
+train_set, test_set = database.trainTestSet(0.9)
 
 # Define the neural network structure
 neural_net = NeuralNetwork(
@@ -41,6 +41,9 @@ neural_net.train_neural_network(
     test_set=test_set,
     net_model=neural_net.conv_neural_network_model
     )
+
+print("Train size: " + str(train_set.length))
+print("Test size: " + str(test_set.length))
 
 #neural_net.predict(train_set.get_data()[0], train_set.get_labels()[0])
 

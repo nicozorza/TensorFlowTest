@@ -35,6 +35,17 @@ class Mfcc:
             label=self.label
         )
 
+    def sampleCompleteZeros(self, size):
+        if size < self.n_frames:
+            print("Wrong size")
+            size = self.n_frames
+
+        aux = np.concatenate((self.mfcc, np.zeros(shape=(size-self.n_frames, self.n_mfcc))))
+        return Mfcc(
+            mfcc=aux,
+            label=self.label
+        )
+
 
 
 class MfccDatabase:
@@ -73,6 +84,22 @@ class MfccDatabase:
         for i in range(self.length):
             trimmed = self.mfccDatabase[i].sampleTrim(size)
             aux.append(trimmed.mfcc, trimmed.label)
+        return aux
+
+    def sampleCompleteZeros(self, size=None):
+
+        if size is None:
+            aux_size = self.mfccDatabase[0].n_frames
+            for i in range(self.length):
+                aux2 = self.mfccDatabase[i].n_frames
+                if aux2 >= aux_size:
+                    aux_size = aux2
+            size = aux_size
+
+        aux = MfccDatabase()
+        for i in range(self.length):
+            completed = self.mfccDatabase[i].sampleCompleteZeros(size)
+            aux.append(completed.mfcc, completed.label)
         return aux
 
     def trainTestSet(self, factor):
