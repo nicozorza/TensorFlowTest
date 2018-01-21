@@ -1,4 +1,3 @@
-
 import librosa
 import speechpy
 import pickle
@@ -9,14 +8,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-MFCC_DIR = '/home/nicozorza/Escritorio/TensorflowTest/digits_database'
+MFCC_DIR = '/home/nicozorza/Escritorio/TensorFlowTest/digits_database'
 WAV_DIR = MFCC_DIR+'/wav'
 OUT_FILE = 'Database'
 
 # Get the names of the directories in the wav database
 NUMBERS_DIR_LIST = os.listdir(WAV_DIR)
 
-n_mfcc = 15                 # Number of MFCC coefficients
+n_mfcc = 13                 # Number of MFCC coefficients
 preemphasis_coeff = 0.98
 frame_length = 0.02         # Length of the frame window
 frame_stride = 0.01         # Slide of the window
@@ -27,6 +26,8 @@ database = MfccDatabase()
 
 figure = 0
 show_figures = False
+
+max_wav_len = 56595
 
 wav_counter = 0
 for dirs in range(len(NUMBERS_DIR_LIST)):
@@ -41,6 +42,11 @@ for dirs in range(len(NUMBERS_DIR_LIST)):
 
         # Read the wav file
         signal, fs = librosa.load(WAV_DIR+'/'+NUMBERS_DIR_LIST[dirs]+'/'+wav_list_path[wavs])
+        if len(signal) > max_wav_len:
+            print("Wrong length")
+        if len(signal) < max_wav_len:
+            signal = np.concatenate((signal, np.zeros(shape=(max_wav_len-len(signal)))))
+
         # Apply a pre-emphasis filter
         signal_preemphasized = speechpy.processing.preemphasis(signal=signal, cof=preemphasis_coeff)
         # Get the MFCCs coefficients. The size of the matrix is n_mfcc x T, so the dimensions
@@ -73,11 +79,10 @@ for dirs in range(len(NUMBERS_DIR_LIST)):
         print('Wav', wav_counter, 'completed out of', len(wav_list_path)*len(NUMBERS_DIR_LIST), 'Label: ', dir_name)
 if show_figures:
     plt.show()
-
 # Save the database into a file
 file = open(MFCC_DIR + '/' + OUT_FILE, 'wb')
 # Trim the samples to a fixed length
-pickle.dump(database.sampleCompleteZeros().print(), file)
+pickle.dump(database.print(), file)
 file.close()
 
 print("Database generated")
