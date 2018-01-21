@@ -1,15 +1,13 @@
-import tensorflow as tf
-from src.speech_recognition.NeuralNetwork import  NeuralNetwork
+from src.speech_recognition.NeuralNetwork import NeuralNetwork
 from src.speech_recognition.MfccDatabase import MfccDatabase
-import numpy as np
 import pickle
 
-MFCC_DIR = '/home/nicozorza/Escritorio/TensorflowTest/digits_database'
+MFCC_DIR = '/home/nicozorza/Escritorio/TensorFlowTest/digits_database'
 OUT_FILE = 'Database'
 
-learning_rate = 0.01
+learning_rate = 0.001
 n_classes = 10
-n_epochs = 10
+n_epochs = 300
 
 # Load the database
 file = open(MFCC_DIR+'/'+OUT_FILE, 'rb')
@@ -20,7 +18,7 @@ database = MfccDatabase(data)
 # Get the MFCC matrix size
 n_mfcc = database.getNMfcc()
 n_frames = database.getNFrames()
-batch_size = 50
+batch_size = 20
 
 # Separate train and test samples
 train_set, test_set = database.trainTestSet(0.9)
