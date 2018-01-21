@@ -107,7 +107,7 @@ class MfccDatabase:
         aux_data = self.mfccDatabase
         random.shuffle(aux_data)
         train_set = MfccDatabase(aux_data[:n_train])
-        test_set = MfccDatabase(aux_data[n_train + 1:])
+        test_set = MfccDatabase(aux_data[n_train:])
         return train_set, test_set
 
     # This method assumes the size is the same for every sample
