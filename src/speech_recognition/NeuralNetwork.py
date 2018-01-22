@@ -1,5 +1,5 @@
 import tensorflow as tf
-
+import numpy as np
 
 class NeuralNetwork:
 
@@ -18,8 +18,9 @@ class NeuralNetwork:
         self.n_mfcc = n_mfcc
         self.n_frames = n_frames
         self.x = tf.placeholder(dtype='float', shape=[None, self.n_frames * self.n_mfcc], name='input')
-        self.y = tf.placeholder(dtype='float', shape=[None, self.n_classes], name='output')
+        self.y = tf.placeholder(dtype='float', shape=[None, self.n_classes], name='labels')
         self.graph_def = None
+        self.saver = None
 
     def neural_network_model(self):
 
@@ -86,13 +87,14 @@ class NeuralNetwork:
 
         return logits
 
-    def train_neural_network(self, train_set, test_set, net_model):
+    def train_neural_network(self, train_set, test_set, net_model, model_file_name):
         prediction = net_model()
-
+        output = tf.argmax(input=prediction, axis=1, name='output')
         cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=self.y, logits=prediction))
 
         optimizer = tf.train.AdamOptimizer(learning_rate=self.learning_rate).minimize(cost)
 
+        self.saver = tf.train.Saver()
         with tf.Session() as sess:
             sess.run(tf.global_variables_initializer())
             for epoch in range(self.n_epochs):
@@ -118,3 +120,42 @@ class NeuralNetwork:
                 self.x: test_set.getData(),
                 self.y: test_set.getLabels()
             }))
+
+            self.graph_def = tf.graph_util.convert_variables_to_constants(sess, sess.graph_def, ["output"])
+
+    def predict(self, test_mfcc):
+        # TODO Esto es medio desprolijo
+        if not self.graph_def:
+            print("No model trained")
+            return
+
+        input, output = tf.import_graph_def(self.graph_def,
+                                            return_elements=[
+                                                "input:0",
+                                                "output:0"]
+                                            )
+
+        data = np.ndarray(
+            shape=[1, test_mfcc.n_mfcc*test_mfcc.n_frames],
+        )
+
+        data[0] = np.hstack(test_mfcc.getData())
+        with tf.Session() as session:
+            aux = session.run([output], feed_dict={input: data})[0]
+            return aux[0]
+
+    def save_model(self, file_name):
+
+        if not self.graph_def:
+            print("No model trained")
+            return
+
+        with open(file_name, 'wb') as f:
+            f.write(self.graph_def.SerializeToString())
+
+    def load_model(self, file_name):
+
+        with open(file_name, "rb") as f:
+            self.graph_def = tf.GraphDef()
+            self.graph_def.ParseFromString(f.read())
+

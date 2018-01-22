@@ -4,10 +4,14 @@ import pickle
 
 MFCC_DIR = '/home/nicozorza/Escritorio/TensorFlowTest/digits_database'
 OUT_FILE = 'Database'
+OUT_MODEL_DIR = 'SavedModels'
+OUT_MODEL = 'NetworkModel'
+
+train_flag = True
 
 learning_rate = 0.001
 n_classes = 10
-n_epochs = 300
+n_epochs = 1
 
 # Load the database
 file = open(MFCC_DIR+'/'+OUT_FILE, 'rb')
@@ -33,15 +37,22 @@ neural_net = NeuralNetwork(
     n_frames=n_frames
     )
 
-# Train the network
-neural_net.train_neural_network(
-    train_set=train_set,
-    test_set=test_set,
-    net_model=neural_net.conv_neural_network_model
-    )
+if train_flag:
+    # Train the network
+    neural_net.train_neural_network(
+        train_set=train_set,
+        test_set=test_set,
+        net_model=neural_net.conv_neural_network_model,
+        model_file_name=MFCC_DIR+'/'+OUT_MODEL_DIR+'/'+OUT_MODEL
+        )
+    neural_net.save_model(MFCC_DIR+'/'+OUT_MODEL_DIR+'/'+OUT_MODEL)
 
-print("Train size: " + str(train_set.length))
-print("Test size: " + str(test_set.length))
+    print("Train size: " + str(train_set.length))
+    print("Test size: " + str(test_set.length))
 
-#neural_net.predict(train_set.get_data()[0], train_set.get_labels()[0])
+neural_net.load_model(MFCC_DIR+'/'+OUT_MODEL_DIR+'/'+OUT_MODEL)
+test_data = test_set.getMfccFromIndex(0)
+
+predicted = neural_net.predict(test_data)
+print('Label: ' + str(test_data.label) + ' --- ' + 'Predicted: ' + str(predicted))
 

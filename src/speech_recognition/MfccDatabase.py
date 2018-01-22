@@ -46,6 +46,11 @@ class Mfcc:
             label=self.label
         )
 
+    def getData(self):
+        return self.mfcc
+
+    def getLabel(self):
+        return self.label
 
 
 class MfccDatabase:
@@ -151,7 +156,12 @@ class MfccDatabase:
         random.shuffle(aux)
         data = MfccDatabase(aux[0:batch_size], batch_size)
 
-        return data.getData(), data.getLabels()    #CHEACKEAR ESTO
+        return data.getData(), data.getLabels()    #TODO CHEACKEAR ESTO
 
     def __len__(self):
         return self.length
+
+    def getMfccFromIndex(self, index):
+        if index > self.length:
+            return None
+        return self.mfccDatabase[index]
