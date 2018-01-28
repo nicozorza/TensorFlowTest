@@ -27,8 +27,8 @@ database = MfccDatabase()
 figure = 0
 show_figures = False
 
-max_wav_len = 56595
-
+max_wav_len = 56659
+wav_len = 0
 wav_counter = 0
 for dirs in range(len(NUMBERS_DIR_LIST)):
     # Get the name of the directory
@@ -42,6 +42,8 @@ for dirs in range(len(NUMBERS_DIR_LIST)):
 
         # Read the wav file
         signal, fs = librosa.load(WAV_DIR+'/'+NUMBERS_DIR_LIST[dirs]+'/'+wav_list_path[wavs])
+        if wav_len < len(signal):
+            wav_len = len(signal)
         if len(signal) > max_wav_len:
             print("Wrong length")
         if len(signal) < max_wav_len:
@@ -77,6 +79,7 @@ for dirs in range(len(NUMBERS_DIR_LIST)):
             plt.draw()
 
         print('Wav', wav_counter, 'completed out of', len(wav_list_path)*len(NUMBERS_DIR_LIST), 'Label: ', dir_name)
+print(wav_len)
 if show_figures:
     plt.show()
 # Save the database into a file

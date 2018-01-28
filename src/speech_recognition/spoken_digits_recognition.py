@@ -9,9 +9,9 @@ OUT_MODEL = 'NetworkModel'
 
 train_flag = True
 
-learning_rate = 0.001
+learning_rate = 0.0005
 n_classes = 10
-n_epochs = 1
+n_epochs = 500
 
 # Load the database
 file = open(MFCC_DIR+'/'+OUT_FILE, 'rb')

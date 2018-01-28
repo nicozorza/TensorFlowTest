@@ -58,8 +58,8 @@ class NeuralNetwork:
         return output
 
     def conv_neural_network_model(self):
-        conv1_filters = 10
-        conv2_filters = 5
+        conv1_filters = 12
+        conv2_filters = 4
         pool2_flat_size = int(self.n_frames/4)*int(self.n_mfcc/4)*conv2_filters
         pool2_flat_dense_size = 100
 
@@ -101,7 +101,7 @@ class NeuralNetwork:
                 epoch_loss = 0
 
                 for _ in range(int(train_set.length / self.batch_size)):
-                    epoch_x, epoch_y = train_set.next_batch(self.batch_size)
+                    epoch_x, epoch_y = train_set.next_batch()
 
                     _, c = sess.run(
                         [optimizer, cost], feed_dict={

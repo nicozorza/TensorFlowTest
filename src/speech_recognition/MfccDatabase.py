@@ -22,9 +22,6 @@ class Mfcc:
     def getNFrames(self):
         return self.n_frames
 
-    def __str__(self):
-        return 'Label: '+str(self.label)+'\n' + 'Data: '+str(self.mfcc)
-
     def sampleTrim(self, size):
         if size > self.n_frames:
             print("Size too big")
@@ -52,8 +49,11 @@ class Mfcc:
     def getLabel(self):
         return self.label
 
+    def __str__(self):
+        return 'Label: '+str(self.label)+'\n' + 'Data: '+str(self.mfcc)
 
-class MfccDatabase:
+
+class MfccDatabase(Mfcc):
     def __init__(self, mfccDatabase=None, batch_size=100):
         if mfccDatabase is None:
             self.mfccDatabase = []
@@ -62,21 +62,17 @@ class MfccDatabase:
         self.batch_size = batch_size
         self.length = len(self.mfccDatabase)
 
+        self.batch_count = 0
+        self.batch_plan = None
+
     def append(self, mfcc, label):
         self.mfccDatabase.append(Mfcc(mfcc, label))
         self.length = len(self.mfccDatabase)
-
-    def __str__(self):
-        aux = ""
-        for i in range(len(self.mfccDatabase)):
-            aux += str(self.mfccDatabase[i]) + '\n'
-        return aux
 
     def print(self):
         return self.mfccDatabase
 
     def sampleTrim(self, size=None):
-
         if size is None:
             aux_size = self.mfccDatabase[0].n_frames
             for i in range(self.length):
@@ -92,7 +88,6 @@ class MfccDatabase:
         return aux
 
     def sampleCompleteZeros(self, size=None):
-
         if size is None:
             aux_size = self.mfccDatabase[0].n_frames
             for i in range(self.length):
@@ -134,34 +129,55 @@ class MfccDatabase:
             shape=[self.length, self.getNFrames()*self.getNMfcc()]
         )
         for _ in range(self.length):
-            data[_] = np.hstack(self.mfccDatabase[_].mfcc)
+            data[_] = np.hstack(self.mfccDatabase[_].getData())
         return data
 
-
     def getLabels(self):
-
         labels = np.ndarray(
             shape=[self.length, 10]
         )
         for i in range(len(self.mfccDatabase)):
             aux = np.zeros(10)
-            aux[self.mfccDatabase[i].label] = 1
+            aux[self.mfccDatabase[i].getLabel()] = 1
             labels[i] = aux
         return labels
 
-    def next_batch(self, batch_size=100):
-        if batch_size is not None:
-            self.batch_size = batch_size
-        aux = self.mfccDatabase
-        random.shuffle(aux)
-        data = MfccDatabase(aux[0:batch_size], batch_size)
+    def create_batch_plan(self):
+        self.batch_plan = self.mfccDatabase
+        random.shuffle(self.batch_plan)
+        self.batch_count = 0
+
+    def next_batch(self):
+        if self.batch_count == 0:
+            self.create_batch_plan()
+
+        start_index = self.batch_size * self.batch_count
+        end_index = start_index + self.batch_size
+        self.batch_count += 1
+        if end_index >= len(self.batch_plan):
+            end_index = len(self.batch_plan)
+            start_index = end_index - self.batch_size
+            self.batch_count = 0
+
+        data = MfccDatabase(self.batch_plan[start_index:end_index], self.batch_size)
 
         return data.getData(), data.getLabels()    #TODO CHEACKEAR ESTO
-
-    def __len__(self):
-        return self.length
 
     def getMfccFromIndex(self, index):
         if index > self.length:
             return None
         return self.mfccDatabase[index]
+
+    def getMfccFromRange(self, start_index, end_index):
+        if end_index > self.length or start_index > end_index:
+            return None
+        return MfccDatabase(self.mfccDatabase[start_index:end_index])
+
+    def __len__(self):
+        return self.length
+
+    def __str__(self):
+        aux = ""
+        for i in range(len(self.mfccDatabase)):
+            aux += str(self.mfccDatabase[i]) + '\n'
+        return aux
