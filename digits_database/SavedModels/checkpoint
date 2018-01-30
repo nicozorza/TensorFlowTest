@@ -1,2 +1,0 @@
-model_checkpoint_path: "/home/nicozorza/Escritorio/TensorFlowTest/digits_database/SavedModels/TflearnNetworkModel"
-all_model_checkpoint_paths: "/home/nicozorza/Escritorio/TensorFlowTest/digits_database/SavedModels/TflearnNetworkModel"

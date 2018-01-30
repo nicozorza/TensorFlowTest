@@ -18,8 +18,7 @@ class TflearnNeuralNetwork:
         self.n_epochs = n_epochs
         self.n_mfcc = n_mfcc
         self.n_frames = n_frames
-        self.graph_def = None
-        self.saver = None
+        self.model = None
 
     def neural_network_model(self):
         n_nodes_hl1 = 30
@@ -31,9 +30,9 @@ class TflearnNeuralNetwork:
         net = tflearn.fully_connected(net, self.n_classes, activation='softmax')
         net = tflearn.regression(net)
 
-        model = tflearn.DNN(net)
+        self.model = tflearn.DNN(net, tensorboard_verbose=0)
 
-        return model
+        return self.model
 
     def conv_neural_network_model(self):
         conv1_filters = 10
@@ -49,7 +48,7 @@ class TflearnNeuralNetwork:
         network = tflearn.max_pool_2d(network, 2)
         network = tflearn.local_response_normalization(network)
         network = tflearn.fully_connected(network, pool2_flat_dense_size, activation='tanh', regularizer="L2")
-        #network = tflearn.dropout(network, 0.8)
+        #network = tflearn.dropout(network, 0.1)
         network = tflearn.fully_connected(network, self.n_classes, activation='softmax')
         network = tflearn.regression(
             network, optimizer='adam',
@@ -57,11 +56,13 @@ class TflearnNeuralNetwork:
             loss='categorical_crossentropy',
             name='target')
 
-        model = tflearn.DNN(network, tensorboard_verbose=0)
+        self.model = tflearn.DNN(network, tensorboard_verbose=0)
 
-        return model
+        return self.model
 
-    def train_neural_network(self, train_set, net_model):
+    def train_neural_network(self, train_set, net_model=None):
+        if net_model is None:
+            net_model = self.model
         net_model.fit(
             train_set.getData(),
             train_set.getLabels(),
@@ -69,16 +70,29 @@ class TflearnNeuralNetwork:
             batch_size=self.batch_size,
             show_metric=True)
 
-    def predict(self, test_mfcc, net_model):
-        data = np.ndarray(
-            shape=[1, self.n_mfcc * self.n_frames],
-        )
+    def train_validate_neural_network(self, complete_set, val_factor, net_model=None):
+        if net_model is None:
+            net_model = self.model
+        net_model.fit(
+            complete_set.getData(),
+            complete_set.getLabels(),
+            validation_set=val_factor,
+            n_epoch=self.n_epochs,
+            batch_size=self.batch_size,
+            show_metric=True)
 
+    def predict(self, test_mfcc, net_model=None):
+        if net_model is None:
+            net_model = self.model
+
+        data = np.ndarray(shape=[1, self.n_mfcc * self.n_frames])
         data[0] = np.hstack(test_mfcc.getData())
-        pred = net_model.predict(data)
-        return np.argmax(pred)
+        label = net_model.predict_label(data)[0][0]
+        return label
 
-    def validate(self, test_set, net_model):
+    def validate(self, test_set, net_model=None):
+        if net_model is None:
+            net_model = self.model
         counter = 0
 
         for i in range(test_set.length):
@@ -91,10 +105,14 @@ class TflearnNeuralNetwork:
                 print('\033[91m' + 'Label: ' + str(test_mfcc.getLabel()) + ' --- ' + 'Predicted: ' + str(prediction) + '\033[0m')
         return (counter / test_set.length)*100
 
-    def save_model(self, file_name, model):
+    def save_model(self, file_name, model=None):
+        if model is None:
+            model = self.model
         model.save(file_name)
 
-    def load_model(self, file_name, model):
+    def load_model(self, file_name, model=None):
+        if model is None:
+            model = self.model
         model.load(file_name)
+        self.model = model
         return model
-
