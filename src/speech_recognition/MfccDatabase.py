@@ -103,12 +103,52 @@ class MfccDatabase(Mfcc):
         return aux
 
     def trainTestSet(self, factor):
-        n_train = int(factor * self.length)
-        aux_data = self.mfccDatabase
-        random.shuffle(aux_data)
-        train_set = MfccDatabase(aux_data[:n_train])
-        test_set = MfccDatabase(aux_data[n_train:])
+        n_train = int(factor * self.length/10)
+
+        zero = self.getSubsetFromLabel(0).mfccDatabase
+        random.shuffle(zero)
+        one = self.getSubsetFromLabel(1).mfccDatabase
+        random.shuffle(one)
+        two = self.getSubsetFromLabel(2).mfccDatabase
+        random.shuffle(two)
+        three = self.getSubsetFromLabel(3).mfccDatabase
+        random.shuffle(three)
+        four = self.getSubsetFromLabel(4).mfccDatabase
+        random.shuffle(four)
+        five = self.getSubsetFromLabel(5).mfccDatabase
+        random.shuffle(five)
+        six = self.getSubsetFromLabel(6).mfccDatabase
+        random.shuffle(six)
+        seven = self.getSubsetFromLabel(7).mfccDatabase
+        random.shuffle(seven)
+        eight = self.getSubsetFromLabel(8).mfccDatabase
+        random.shuffle(eight)
+        nine = self.getSubsetFromLabel(9).mfccDatabase
+        random.shuffle(nine)
+
+        train_set = MfccDatabase(
+            zero[:n_train] + one[:n_train] + two[:n_train] + three[:n_train] + four[:n_train]+
+            five[:n_train] + six[:n_train] + seven[:n_train] + eight[:n_train] + nine[:n_train]
+        )
+        test_set = MfccDatabase(
+            zero[n_train:] + one[n_train:] + two[n_train:] + three[n_train:] + four[n_train:] +
+            five[n_train:] + six[n_train:] + seven[n_train:] + eight[n_train:] + nine[n_train:]
+        )
         return train_set, test_set
+
+    def getSubsetFromLabel(self, label):
+        aux_data = self.mfccDatabase
+        init_index = 0
+        end_index = 0
+        for i in range(self.length):
+            if aux_data[i].label == label:
+                init_index = i
+                for j in range(self.length-i):
+                    if aux_data[i+j].label == label:
+                        end_index = i+j
+                break
+        return MfccDatabase(aux_data[init_index:end_index+1])
+
 
     # This method assumes the size is the same for every sample
     def getNMfcc(self):
