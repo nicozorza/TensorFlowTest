@@ -21,14 +21,20 @@ class TflearnNeuralNetwork:
         self.model = None
 
     def neural_network_model(self):
-        n_nodes_hl1 = 30
+        n_nodes_hl1 = 100
         n_nodes_hl2 = 100
+        n_nodes_hl3 = 40
 
         net = tflearn.input_data(shape=[None, self.n_frames * self.n_mfcc])
         net = tflearn.fully_connected(net, n_nodes_hl1, activation='tanh', regularizer='L2')
         net = tflearn.fully_connected(net, n_nodes_hl2, activation='tanh', regularizer='L2')
-        net = tflearn.fully_connected(net, self.n_classes, activation='softmax')
-        net = tflearn.regression(net)
+       # net = tflearn.fully_connected(net, n_nodes_hl3, activation='tanh', regularizer='L2')
+        net = tflearn.fully_connected(net, self.n_classes, activation='softmax', regularizer='L2')
+        net = tflearn.regression(net,
+                                 optimizer='adam',
+                                 learning_rate=self.learning_rate,
+                                 loss='categorical_crossentropy',
+                                 name='target')
 
         self.model = tflearn.DNN(net, tensorboard_verbose=0)
 
@@ -51,7 +57,8 @@ class TflearnNeuralNetwork:
         #network = tflearn.dropout(network, 0.1)
         network = tflearn.fully_connected(network, self.n_classes, activation='softmax')
         network = tflearn.regression(
-            network, optimizer='adam',
+            network,
+            optimizer='adam',
             learning_rate=self.learning_rate,
             loss='categorical_crossentropy',
             name='target')
