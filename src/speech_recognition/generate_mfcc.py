@@ -27,7 +27,7 @@ database = MfccDatabase()
 figure = 0
 show_figures = False
 
-max_wav_len = 56659
+max_wav_len = 56705
 wav_len = 0
 wav_counter = 0
 for dirs in range(len(NUMBERS_DIR_LIST)):
