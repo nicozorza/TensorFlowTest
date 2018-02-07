@@ -2,3 +2,4 @@ digits_database/SavedModels/Datasets/combined_database filter=lfs diff=lfs merge
 digits_database/SavedModels/Datasets/combined_database_reduced filter=lfs diff=lfs merge=lfs -text
 digits_database/SavedModels/Datasets/Custom_database filter=lfs diff=lfs merge=lfs -text
 digits_database/SavedModels/Datasets/tidigits_database filter=lfs diff=lfs merge=lfs -text
+digits_database/SavedModels/Datasets/tidigits_normalized_database filter=lfs diff=lfs merge=lfs -text
