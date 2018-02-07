@@ -1,6 +1,7 @@
 from src.speech_recognition.TflearnNeuralNetwork import TflearnNeuralNetwork
 from src.speech_recognition.MfccDatabase import MfccDatabase
 import pickle
+import time
 
 MFCC_DIR = '/home/nicozorza/Escritorio/TensorFlowTest/digits_database'
 OUT_FILE = 'Database'
@@ -10,11 +11,11 @@ OUT_MODEL = 'NetworkModel'
 # Train = 0
 # Validate = 1
 # Train and validate = 2
-train_flag = 0
+train_flag = 1
 create_datasets = False
 
-batch_size = 50
-learning_rate = 0.0005
+batch_size = 30
+learning_rate = 0.005
 n_classes = 10
 n_epochs = 100
 
@@ -66,8 +67,12 @@ neural_net.conv_neural_network_model()
 # Only train
 if train_flag == 0:
     # Train the network
+    ts = time.time()
     neural_net.train_neural_network(train_set=train_set)
     neural_net.save_model(MFCC_DIR+'/'+OUT_MODEL_DIR+'/'+OUT_MODEL)
+    accuracy = neural_net.validate(test_set)
+    print('Accuracy: ' + str(accuracy))
+    print('Elapsed time: {:02f} min'.format((time.time()-ts)/60))
 
 # Only validate
 if train_flag == 1:
