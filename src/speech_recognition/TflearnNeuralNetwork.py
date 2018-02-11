@@ -22,14 +22,14 @@ class TflearnNeuralNetwork:
 
     def neural_network_model(self):
         n_nodes_hl1 = 100
-        n_nodes_hl2 = 100
-        n_nodes_hl3 = 40
+        n_nodes_hl2 = 90
+        # n_nodes_hl3 = 15
 
         net = tflearn.input_data(shape=[None, self.n_frames * self.n_mfcc])
         net = tflearn.fully_connected(net, n_nodes_hl1, activation='tanh', regularizer='L2')
         net = tflearn.fully_connected(net, n_nodes_hl2, activation='tanh', regularizer='L2')
-       # net = tflearn.fully_connected(net, n_nodes_hl3, activation='tanh', regularizer='L2')
-        net = tflearn.fully_connected(net, self.n_classes, activation='softmax', regularizer='L2')
+        # net = tflearn.fully_connected(net, n_nodes_hl3, activation='tanh', regularizer='L2')
+        net = tflearn.fully_connected(net, self.n_classes, activation='softmax')
         net = tflearn.regression(net,
                                  optimizer='adam',
                                  learning_rate=self.learning_rate,

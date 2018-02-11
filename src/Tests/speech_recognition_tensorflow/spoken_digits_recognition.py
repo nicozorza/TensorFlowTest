@@ -1,4 +1,4 @@
-from src.speech_recognition.NeuralNetwork import NeuralNetwork
+from src.Tests.speech_recognition_tensorflow.NeuralNetwork import NeuralNetwork
 from src.speech_recognition.MfccDatabase import MfccDatabase
 import pickle
 

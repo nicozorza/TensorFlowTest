@@ -11,13 +11,13 @@ OUT_MODEL = 'NetworkModel'
 # Train = 0
 # Validate = 1
 # Train and validate = 2
-train_flag = 1
+train_flag = 0
 create_datasets = False
 
-batch_size = 30
-learning_rate = 0.005
+batch_size = 60
+learning_rate = 0.0005
 n_classes = 10
-n_epochs = 100
+n_epochs = 500
 
 if create_datasets:
     # Load the database
@@ -62,7 +62,7 @@ neural_net = TflearnNeuralNetwork(
     )
 
 # Define network model
-neural_net.conv_neural_network_model()
+neural_net.neural_network_model()
 
 # Only train
 if train_flag == 0:
